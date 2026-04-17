@@ -1,0 +1,34 @@
+#!/bin/bash
+set -euxo pipefail
+
+dnf update -y
+dnf install -y docker
+action="start"
+systemctl enable docker
+systemctl ${action} docker
+
+mkdir -p /opt/mongo/data
+
+cat >/opt/mongo/init.js <<EOF
+use admin
+db.createUser({
+  user: "${mongo_username}",
+  pwd: "${mongo_password}",
+  roles: [
+    { role: "readWrite", db: "${mongo_db_name}" },
+    { role: "dbAdmin", db: "${mongo_db_name}" }
+  ]
+})
+EOF
+
+docker pull mongo:7
+
+docker run -d \
+  --name mongodb \
+  --restart unless-stopped \
+  -p 27017:27017 \
+  -v /opt/mongo/data:/data/db \
+  -v /opt/mongo/init.js:/docker-entrypoint-initdb.d/init.js:ro \
+  -e MONGO_INITDB_ROOT_USERNAME=root \
+  -e MONGO_INITDB_ROOT_PASSWORD=${mongo_root_password} \
+  mongo:7 --bind_ip_all

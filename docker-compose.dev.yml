@@ -1,0 +1,66 @@
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    ports:
+      - "27018:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+      MONGO_INITDB_DATABASE: aegiscare
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh mongodb://root:rootpassword@localhost:27017/admin --quiet --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  mongo-init:
+    image: mongo:7
+    depends_on:
+      mongo:
+        condition: service_healthy
+    entrypoint: ["bash", "-lc"]
+    command: >
+      "mongosh mongodb://root:rootpassword@mongo:27017/admin --eval '
+      db.createUser({ user: \"appuser\", pwd: \"apppassword\", roles: [{ role: \"readWrite\", db: \"aegiscare\" }] })'"
+    restart: "no"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      PORT: 5000
+      NODE_ENV: development
+      MONGO_URI: mongodb://appuser:apppassword@mongo:27017/aegiscare?authSource=admin
+      JWT_SECRET: aegiscare-local-super-secret-123
+      JWT_EXPIRES_IN: 1d
+      COOKIE_NAME: aegiscare_token
+      COOKIE_SECURE: "false"
+      CORS_ORIGIN: http://localhost:5173
+      DEFAULT_ADMIN_EMAIL: admin@example.com
+      DEFAULT_ADMIN_PASSWORD: ChangeMe123!
+    depends_on:
+      mongo:
+        condition: service_healthy
+      mongo-init:
+        condition: service_completed_successfully
+    ports:
+      - "5000:5000"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: http://localhost:5000/api
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  mongo_data:

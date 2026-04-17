@@ -1,0 +1,25 @@
+{
+  "name": "aegiscare-backend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "lint": "node --check src/server.js && node --check src/app.js && node --check src/config/env.js && node --check src/models/User.js && node --check src/models/Patient.js && node --check src/models/Claim.js && node --check src/models/AuditEvent.js && node --check src/routes/auth.routes.js && node --check src/routes/patients.routes.js && node --check src/routes/claims.routes.js && node --check src/routes/audit.routes.js && node --check src/routes/privacy.routes.js && node --check src/routes/portal.routes.js && node --check src/routes/demo.routes.js && node --check src/routes/health.routes.js",
+    "seed:admin": "node src/scripts/createAdmin.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "express-rate-limit": "^7.4.1",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.8.0",
+    "morgan": "^1.10.0",
+    "zod": "^3.23.8"
+  }
+}

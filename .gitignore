@@ -1,0 +1,11 @@
+node_modules/
+dist/
+build/
+coverage/
+.env
+.env.*
+backend/.env
+frontend/.env
+security/evidence/
+*.log
+.DS_Store

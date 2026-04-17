@@ -1,0 +1,14 @@
+project_name         = "aegiscare"
+environment          = "dev"
+aws_region           = "us-east-1"
+allowed_ingress_cidr = "0.0.0.0/0"
+acm_certificate_arn  = "arn:aws:acm:us-east-1:123456789012:certificate/replace-me"
+alert_email          = "security-team@example.com"
+enable_guardduty     = true
+enable_waf           = true
+enable_auto_response = true
+auto_response_mode   = "simulate"
+
+# Replace after building and pushing application images to ECR.
+frontend_image = "123456789012.dkr.ecr.us-east-1.amazonaws.com/aegiscare-dev/frontend:latest"
+backend_image  = "123456789012.dkr.ecr.us-east-1.amazonaws.com/aegiscare-dev/backend:latest"
