@@ -55,6 +55,58 @@ The project is framed around **HIPAA-aligned privacy controls** and maps especia
 - **NIST SP 800-53 AC family** — access control and least privilege
 - **NIST SP 800-53 AU family** — audit logging and accountability
 
+## Security Controls
+
+The portal implements the following NIST SP 800-53 controls in code, with each
+control verifiable from the running backend and traceable to specific files.
+
+### Threats addressed
+
+| # | Threat | Mitigation | Control | Evidence |
+|---|---|---|---|---|
+| 1 | Audit log tampering by an insider with database access | SHA-256 hash chain across audit events; admin-only `/api/audit/verify` walks the chain and identifies the first tampered record | **AU-9** Protection of Audit Information | `backend/src/utils/auditHash.js`, `backend/src/middleware/audit.js`, `backend/src/routes/audit.routes.js` |
+| 2 | Brute-force credential attack against a known account | Five-failure threshold then 15-minute account lockout; locked attempts are rejected before bcrypt runs and are written to the audit log | **AC-7** Unsuccessful Logon Attempts | `backend/src/models/User.js`, `backend/src/routes/auth.routes.js` |
+| 3 | Plaintext-HTTP downgrade / SSL stripping | HSTS header `max-age=31536000; includeSubDomains; preload` so browsers refuse plain HTTP for one year | **SC-8** Transmission Confidentiality | `backend/src/app.js` (helmet hsts) |
+| 4 | Cookie misconfiguration in production (operator forgets to set `COOKIE_SECURE=true`) | `cookieSecure` is derived from `NODE_ENV` and forced to `true` in production regardless of `.env` | **SC-23** Session Authenticity | `backend/src/config/env.js` |
+| 5 | Credential leakage in API responses (accidental serialization of `passwordHash`) | Mongoose `select: false` on the field; only the login query opts in via `.select("+passwordHash")` | **IA-5** Authenticator Management | `backend/src/models/User.js`, `backend/src/routes/auth.routes.js` |
+| 6 | Cross-site request forgery against authenticated users | Double-submit cookie pattern: random 32-byte token in a non-httpOnly cookie, frontend echoes it as `X-CSRF-Token`, backend timing-safe-compares; safe methods bypass | **SC-23** Session Authenticity | `backend/src/middleware/csrf.js`, `frontend/src/api.js` |
+
+### Control summary
+
+- **AC-3 Access Enforcement** — `requireRole("doctor", "admin")` middleware on every protected route
+- **AC-7 Unsuccessful Logon Attempts** — 5 failures → 15-minute account lockout
+- **AU-2 / AU-3 / AU-12 Audit** — every sensitive action logged with actor id, role, IP, user-agent, resource, outcome, and timestamp
+- **AU-9 Protection of Audit Information** — SHA-256 hash chain, verifiable via `GET /api/audit/verify`
+- **IA-2 Authentication** — bcrypt cost 12, JWT in httpOnly cookie
+- **IA-5 Authenticator Management** — minimum 10-character password with uppercase + number requirement; password hashes hidden by default
+- **SC-5 Denial of Service Protection** — `express-rate-limit` on `/api/auth` (20 req / 15 min)
+- **SC-8 Transmission Confidentiality** — HSTS, single-origin CORS allowlist
+- **SC-23 Session Authenticity** — httpOnly cookies, Secure flag forced in production, double-submit CSRF tokens
+- **SI-10 Input Validation** — Zod schemas on every route; regex-escaped MongoDB queries
+
+### Verifying the controls locally
+
+```bash
+# HSTS header is present
+curl -i http://localhost:5001/health | grep -i strict-transport
+
+# CSRF rejects state-changing requests without the header
+curl -i -X POST http://localhost:5001/api/demo/bootstrap -H 'Content-Type: application/json' -d '{}'
+# expected: HTTP 403 "Invalid or missing CSRF token"
+
+# Audit chain integrity (after admin login)
+curl -b cookies.txt http://localhost:5001/api/audit/verify
+# expected: { "verified": true, "breaks": [] }
+
+# Account lockout fires after 5 failed logins
+for i in 1 2 3 4 5; do
+  curl -X POST http://localhost:5001/api/auth/login \
+    -H 'Content-Type: application/json' \
+    -d '{"email":"doctor.demo@aegiscare.local","password":"wrong"}'
+done
+# expected: HTTP 423 on the 5th attempt
+```
+
 ## Repository layout
 
 - `frontend/` — React + Vite client
