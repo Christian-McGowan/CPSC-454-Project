@@ -25,11 +25,18 @@ if (!parsed.success) {
   process.exit(1);
 }
 
+const isProduction = parsed.data.NODE_ENV === "production";
+
+// NIST SC-8 / SC-23: in production, cookies MUST be marked Secure regardless
+// of what the operator sets in .env. The override only loosens the flag when
+// running locally over plain HTTP.
+const cookieSecure = isProduction ? true : parsed.data.COOKIE_SECURE === "true";
+
 export const env = {
   ...parsed.data,
   port: Number(parsed.data.PORT),
-  isProduction: parsed.data.NODE_ENV === "production",
-  cookieSecure: parsed.data.COOKIE_SECURE === "true",
+  isProduction,
+  cookieSecure,
   allowPublicRegistration: parsed.data.ALLOW_PUBLIC_REGISTRATION === "true",
-  seedDemoUsersOnStartup: parsed.data.NODE_ENV !== "production" && parsed.data.SEED_DEMO_USERS_ON_STARTUP === "true"
+  seedDemoUsersOnStartup: !isProduction && parsed.data.SEED_DEMO_USERS_ON_STARTUP === "true"
 };

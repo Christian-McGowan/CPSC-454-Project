@@ -12,7 +12,8 @@ export async function requireAuth(req, res, next) {
     }
 
     const payload = verifyToken(token);
-    const user = await User.findById(payload.sub).select("-passwordHash");
+    // passwordHash is hidden by default via the User schema's select:false.
+    const user = await User.findById(payload.sub);
 
     if (!user) {
       return res.status(401).json({ message: "User no longer exists" });

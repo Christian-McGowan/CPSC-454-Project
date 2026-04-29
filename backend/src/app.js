@@ -13,6 +13,7 @@ import portalRoutes from "./routes/portal.routes.js";
 import demoRoutes from "./routes/demo.routes.js";
 import { env } from "./config/env.js";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
+import { issueCsrfCookie, verifyCsrfToken } from "./middleware/csrf.js";
 
 const app = express();
 
@@ -24,7 +25,15 @@ app.use(
     crossOriginResourcePolicy: { policy: "cross-origin" },
     contentSecurityPolicy: false,
     frameguard: { action: "deny" },
-    referrerPolicy: { policy: "no-referrer" }
+    referrerPolicy: { policy: "no-referrer" },
+    // NIST SC-8: enforce HTTPS at the user agent for one year, including
+    // every subdomain. Browsers that have seen this header refuse to make
+    // plain-HTTP requests to the origin even if the user types http://.
+    hsts: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true
+    }
   })
 );
 
@@ -39,8 +48,15 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(morgan(env.isProduction ? "combined" : "dev"));
 
+// Health check is exempt from CSRF (read-only, no auth state).
 app.use(healthRoutes);
+
+// Issue the CSRF cookie on every request, then enforce double-submit on
+// state-changing requests. Auth routes opt out of enforcement (see below)
+// because login itself has no prior session to attach a token to.
+app.use(issueCsrfCookie);
 app.use("/api/auth", authRoutes);
+app.use(verifyCsrfToken);
 app.use("/api/portal", portalRoutes);
 app.use("/api/patients", patientsRoutes);
 app.use("/api/claims", claimsRoutes);

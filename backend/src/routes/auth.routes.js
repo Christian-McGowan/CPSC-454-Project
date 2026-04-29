@@ -132,7 +132,8 @@ router.post(
   validate(loginSchema),
   asyncHandler(async (req, res) => {
     const { email, password } = req.validated.body;
-    const user = await User.findOne({ email });
+    // passwordHash is select:false on the schema; opt in for the login query only.
+    const user = await User.findOne({ email }).select("+passwordHash");
 
     if (!user) {
       await logAuditEvent(req, {

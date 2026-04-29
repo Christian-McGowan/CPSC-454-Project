@@ -1,5 +1,19 @@
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "/api";
 
+// NIST SC-8 / SC-23 — double-submit CSRF protection. The backend issues a
+// non-httpOnly cookie called aegiscare_csrf; we copy its value into the
+// X-CSRF-Token header on every state-changing request so the server can
+// confirm the request originated from same-origin code.
+const CSRF_COOKIE_NAME = "aegiscare_csrf";
+const CSRF_HEADER_NAME = "X-CSRF-Token";
+const STATE_CHANGING_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
+
+function readCsrfToken() {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(new RegExp(`(?:^|; )${CSRF_COOKIE_NAME}=([^;]+)`));
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
 function toQueryString(params = {}) {
   const query = new URLSearchParams();
   Object.entries(params).forEach(([key, value]) => {
@@ -33,10 +47,14 @@ function extractErrorMessage(data, status) {
 }
 
 async function request(path, options = {}) {
+  const method = (options.method || "GET").toUpperCase();
+  const csrfHeader = STATE_CHANGING_METHODS.has(method) ? readCsrfToken() : null;
+
   const response = await fetch(`${API_BASE}${path}`, {
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
+      ...(csrfHeader ? { [CSRF_HEADER_NAME]: csrfHeader } : {}),
       ...(options.headers || {})
     },
     ...options
