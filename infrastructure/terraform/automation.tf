@@ -63,8 +63,8 @@ resource "aws_iam_policy" "lambda_responder" {
         Resource = "*"
       },
       {
-        Effect = "Allow"
-        Action = ["sns:Publish"]
+        Effect   = "Allow"
+        Action   = ["sns:Publish"]
         Resource = aws_sns_topic.alerts.arn
       },
       {
@@ -130,7 +130,7 @@ resource "aws_cloudwatch_event_rule" "guardduty_findings" {
   name        = "${local.name_prefix}-guardduty-findings"
   description = "Send GuardDuty findings to the containment Lambda"
   event_pattern = jsonencode({
-    source = ["aws.guardduty"],
+    source        = ["aws.guardduty"],
     "detail-type" = ["GuardDuty Finding"],
     detail = {
       severity = [{ numeric = [">=", 4] }]
@@ -163,7 +163,7 @@ resource "aws_cloudwatch_event_rule" "inspector_findings" {
   name        = "${local.name_prefix}-inspector-findings"
   description = "Send high-severity Inspector findings to the containment Lambda"
   event_pattern = jsonencode({
-    source = ["aws.inspector2"],
+    source        = ["aws.inspector2"],
     "detail-type" = ["Inspector2 Finding"],
     detail = {
       severity = ["HIGH", "CRITICAL"]
