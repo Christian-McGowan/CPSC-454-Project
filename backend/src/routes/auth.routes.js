@@ -71,6 +71,7 @@ function serializeUser(user) {
 
 router.get("/password-policy", (req, res) => {
   res.json({
+    publicRegistrationEnabled: env.allowPublicRegistration,
     policy: {
       minLength: 10,
       requiresUppercase: true,
@@ -89,6 +90,10 @@ router.post(
   authLimiter,
   validate(registerSchema),
   asyncHandler(async (req, res) => {
+    if (!env.allowPublicRegistration) {
+      return res.status(403).json({ message: "Public registration is disabled. Use the seeded demo accounts or ask an admin to provision access." });
+    }
+
     const { name, email, password, role, organization } = req.validated.body;
     const existing = await User.findOne({ email });
 

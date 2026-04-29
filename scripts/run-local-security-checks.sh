@@ -42,6 +42,14 @@ fi
 if command -v trivy >/dev/null 2>&1; then
   capture_cmd "$EVIDENCE_DIR/trivy-fs.txt" trivy fs --scanners vuln,secret,misconfig "$ROOT_DIR"
   capture_cmd "$EVIDENCE_DIR/trivy-config.txt" trivy config "$ROOT_DIR/infrastructure/terraform"
+  if command -v docker >/dev/null 2>&1; then
+    capture_cmd "$EVIDENCE_DIR/docker-build-backend.txt" docker build -t aegiscare-backend:local "$ROOT_DIR/backend"
+    capture_cmd "$EVIDENCE_DIR/docker-build-frontend.txt" docker build -t aegiscare-frontend:local "$ROOT_DIR/frontend"
+    capture_cmd "$EVIDENCE_DIR/trivy-image-backend.txt" trivy image aegiscare-backend:local
+    capture_cmd "$EVIDENCE_DIR/trivy-image-frontend.txt" trivy image aegiscare-frontend:local
+  else
+    echo "docker not found; skipping image scans" | tee "$EVIDENCE_DIR/trivy-image-backend.txt"
+  fi
 else
   echo "trivy not found; skipping Trivy scans" | tee "$EVIDENCE_DIR/trivy-fs.txt"
 fi

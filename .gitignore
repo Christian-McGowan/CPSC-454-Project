@@ -4,6 +4,9 @@ build/
 coverage/
 .env
 .env.*
+!.env.example
+!backend/.env.example
+!frontend/.env.example
 backend/.env
 frontend/.env
 security/evidence/

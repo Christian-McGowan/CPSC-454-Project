@@ -5,7 +5,6 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { requireAuth, requireRole } from "../middleware/auth.js";
 import { validate } from "../middleware/validate.js";
 import { logAuditEvent } from "../middleware/audit.js";
-import { ensureDemoData } from "../utils/demoSeeder.js";
 
 const router = Router();
 
@@ -84,7 +83,6 @@ router.get(
   "/",
   validate(listPatientsSchema),
   asyncHandler(async (req, res) => {
-    await ensureDemoData();
     const { q, privacyLevel, limit } = req.validated.query;
     const filter = {};
 

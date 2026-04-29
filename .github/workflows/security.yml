@@ -55,10 +55,38 @@ jobs:
         working-directory: frontend
         run: npm audit --audit-level=moderate || true
 
+      - name: Checkov Terraform scan
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: infrastructure/terraform
+          framework: terraform
+          quiet: true
+          soft_fail: true
+
       - name: Trivy filesystem scan
         uses: aquasecurity/trivy-action@0.24.0
         with:
           scan-type: fs
           scan-ref: .
+          format: table
+          exit-code: 0
+
+      - name: Build backend image for scan
+        run: docker build -t aegiscare-backend:ci backend
+
+      - name: Build frontend image for scan
+        run: docker build -t aegiscare-frontend:ci frontend
+
+      - name: Trivy backend image scan
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          image-ref: aegiscare-backend:ci
+          format: table
+          exit-code: 0
+
+      - name: Trivy frontend image scan
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          image-ref: aegiscare-frontend:ci
           format: table
           exit-code: 0

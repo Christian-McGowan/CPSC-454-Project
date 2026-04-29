@@ -23,4 +23,15 @@ auditEventSchema.index({ createdAt: -1 });
 auditEventSchema.index({ actorRole: 1, createdAt: -1 });
 auditEventSchema.index({ patientId: 1, createdAt: -1 });
 
+function blockAuditMutation(next) {
+  next(new Error("Audit events are append-only through the application layer"));
+}
+
+auditEventSchema.pre("updateOne", blockAuditMutation);
+auditEventSchema.pre("updateMany", blockAuditMutation);
+auditEventSchema.pre("findOneAndUpdate", blockAuditMutation);
+auditEventSchema.pre("deleteOne", blockAuditMutation);
+auditEventSchema.pre("deleteMany", blockAuditMutation);
+auditEventSchema.pre("findOneAndDelete", blockAuditMutation);
+
 export const AuditEvent = mongoose.model("AuditEvent", auditEventSchema);

@@ -2,7 +2,7 @@ import { Router } from "express";
 import { z } from "zod";
 import { AuditEvent } from "../models/AuditEvent.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { requireAuth } from "../middleware/auth.js";
+import { requireAuth, requireRole } from "../middleware/auth.js";
 import { validate } from "../middleware/validate.js";
 
 const router = Router();
@@ -20,6 +20,7 @@ const listAuditSchema = z.object({
 router.get(
   "/",
   requireAuth,
+  requireRole("doctor", "admin"),
   validate(listAuditSchema),
   asyncHandler(async (req, res) => {
     const { action, outcome, limit } = req.validated.query;
@@ -30,13 +31,6 @@ router.get(
     }
     if (outcome) {
       filter.outcome = outcome;
-    }
-
-    if (req.user.role === "insurer") {
-      filter.$or = [
-        { actorId: req.user._id },
-        { actorRole: "insurer" }
-      ];
     }
 
     const items = await AuditEvent.find(filter).sort({ createdAt: -1 }).limit(limit);

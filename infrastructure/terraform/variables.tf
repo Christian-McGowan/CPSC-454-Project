@@ -105,6 +105,19 @@ variable "jwt_secret_length" {
   default = 32
 }
 
+
+variable "enable_vpc_endpoints" {
+  type        = bool
+  description = "Create private VPC endpoints for AWS service traffic from private subnets"
+  default     = true
+}
+
+variable "enable_mongo_snapshots" {
+  type        = bool
+  description = "Create a daily DLM snapshot policy for the MongoDB EC2 root volume"
+  default     = true
+}
+
 variable "alert_email" {
   type        = string
   description = "Optional email address subscribed to SNS security alerts"

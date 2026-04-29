@@ -51,7 +51,7 @@ This project is a direct cloud security implementation, not just a themed UI.
 - **Network security story:** the infrastructure baseline uses public/private segmentation so the database and app tier stay off the public internet
 
 ### Compliance alignment
-The project is framed around **HIPAA-ready privacy controls** and maps especially well to:
+The project is framed around **HIPAA-aligned privacy controls** and maps especially well to:
 - **NIST SP 800-53 AC family** — access control and least privilege
 - **NIST SP 800-53 AU family** — audit logging and accountability
 
@@ -115,6 +115,8 @@ That creates:
 - a demo doctor account: `doctor.demo@aegiscare.local / DoctorDemo1`
 - a demo insurer account: `insurer.demo@aegiscare.local / InsurerDemo1`
 
+Public registration is disabled by default through `ALLOW_PUBLIC_REGISTRATION=false`. This keeps account provisioning aligned with NIST AC-2 for the final project. Only set it to `true` for a temporary local test.
+
 ### 6. Open the app
 
 - Frontend: `http://localhost:5173`
@@ -130,8 +132,6 @@ docker compose -f docker-compose.dev.yml up --build
 
 ## How to demo the portal
 
-The easiest class demo is this:
-
 1. Log in as **doctor**
 2. Open **Patient Records** and show a chart
 3. Add a care note to a patient
@@ -139,8 +139,9 @@ The easiest class demo is this:
 5. Log out and sign in as **insurance provider**
 6. Show that **Patient Records** are blocked
 7. Show that **Billing** is still accessible
-8. Open **Audit Trail** and show the recorded actions
+8. Log in as **admin** or **doctor**, open **Audit Trail**, and show the recorded actions
 9. Open **Privacy Center** and explain AC + AU in plain language
+10. Open **Security Assessment** as admin and show the findings/remediation checklist
 
 ### Simple explanation
 
@@ -153,7 +154,7 @@ That makes it a strong healthcare example of cloud security, least privilege, an
 ## Backend API overview
 
 ### Auth
-- `POST /api/auth/register`
+- `POST /api/auth/register` (disabled by default unless `ALLOW_PUBLIC_REGISTRATION=true`)
 - `POST /api/auth/login`
 - `POST /api/auth/logout`
 - `GET /api/auth/me`
@@ -186,6 +187,8 @@ The infrastructure folder is set up as the cloud-security baseline for the assig
 - KMS customer-managed keys for encrypted storage and secrets
 - IAM separation between app execution, admin, and automation roles
 - logs and alerts available for security review
+- private AWS service endpoints for ECR, ECS, Logs, KMS, Secrets Manager, SSM, and S3
+- daily retained EBS snapshots for the MongoDB host through AWS Data Lifecycle Manager
 
 For AWS provisioning:
 
@@ -194,10 +197,19 @@ cd infrastructure/terraform
 cp terraform.tfvars.example terraform.tfvars
 ```
 
-Then run the normal Terraform workflow:
+For local validation without remote state:
 
 ```bash
-terraform init
+terraform init -backend=false
+terraform plan
+```
+
+For a team or cloud deployment, configure remote encrypted Terraform state first:
+
+```bash
+cp backend.example.hcl backend.hcl
+# edit bucket, key, region, and DynamoDB lock table
+terraform init -backend-config=backend.hcl
 terraform plan
 terraform apply
 ```

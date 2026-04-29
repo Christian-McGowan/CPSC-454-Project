@@ -177,14 +177,14 @@ export const ROLE_ACCESS_MATRIX = [
     role: "doctor",
     clinicalRecords: "view_edit",
     billingClaims: "view_submit",
-    auditTrail: "view_limited",
+    auditTrail: "view",
     userManagement: "none"
   },
   {
     role: "insurer",
     clinicalRecords: "none",
     billingClaims: "view_update",
-    auditTrail: "view_own",
+    auditTrail: "none",
     userManagement: "none"
   },
   {
@@ -207,9 +207,9 @@ export const COMPLIANCE_FAMILIES = [
   {
     family: "AU",
     title: "Audit and Accountability",
-    summary: "The portal records authentication, patient chart access, billing actions, and admin demo operations to support HIPAA-ready review.",
+    summary: "The portal records authentication, patient chart access, billing actions, and admin demo operations to support HIPAA-aligned review.",
     mappedControls: ["AU-2 Event Logging", "AU-3 Content of Audit Records", "AU-6 Audit Review"],
-    evidence: ["AuditEvent collection", "Access log timeline in the UI", "Structured metadata with actor, patient, action, and timestamp"]
+    evidence: ["AuditEvent collection", "Doctor/admin access log timeline in the UI", "Structured metadata with actor, patient, action, and timestamp"]
   }
 ];
 

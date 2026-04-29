@@ -684,3 +684,52 @@ textarea {
     grid-template-columns: 1fr;
   }
 }
+
+.assessment-hero .hero-copy-panel h1 {
+  max-width: 900px;
+}
+
+.assessment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.assessment-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.82);
+  padding: 18px;
+  display: grid;
+  gap: 10px;
+}
+
+.assessment-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.assessment-card p {
+  margin: 0;
+  color: var(--text-soft);
+}
+
+.evidence-template {
+  display: grid;
+  gap: 12px;
+  color: var(--text-soft);
+}
+
+.muted-helper {
+  margin-top: 0.75rem;
+  color: #5f6f9a;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.auth-tabs button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

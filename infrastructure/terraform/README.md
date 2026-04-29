@@ -9,6 +9,8 @@ The baseline architecture is designed for a HIPAA-focused healthcare portal:
 - IAM role separation for application tasks and automation
 - KMS-backed encryption for storage, logs, and secrets
 - logging, alerts, and audit-friendly cloud telemetry
+- private VPC endpoints for AWS service traffic from private subnets
+- daily retained snapshots for the MongoDB EC2 volume
 
 ## Main resources
 - VPC and subnet tiers
@@ -25,6 +27,8 @@ The baseline architecture is designed for a HIPAA-focused healthcare portal:
 - WAF web ACL
 - SNS topic for security alerts
 - EventBridge rules and Lambda responder
+- VPC interface/gateway endpoints
+- DLM snapshot policy
 
 ## Safe demo default
 The Lambda responder defaults to:
@@ -34,3 +38,19 @@ auto_response_mode = "simulate"
 ```
 
 That means the automation path is deployed and demonstrable, but does not perform destructive or risky response actions until the team explicitly decides to test that mode.
+
+
+## Remote state
+
+This directory includes a partial S3 backend block so team deployments can use encrypted remote state and DynamoDB locking. Copy `backend.example.hcl` to `backend.hcl`, update the bucket, key, region, and lock-table values, then run:
+
+```bash
+terraform init -backend-config=backend.hcl
+```
+
+For class validation on a machine without the remote-state bucket, use:
+
+```bash
+terraform init -backend=false
+terraform validate
+```
