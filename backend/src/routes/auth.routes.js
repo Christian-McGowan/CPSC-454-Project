@@ -12,6 +12,11 @@ import { logAuditEvent } from "../middleware/audit.js";
 
 const router = Router();
 
+// NIST SP 800-53 AC-7 — unsuccessful logon attempts. After this many
+// consecutive failures the account is temporarily locked.
+const MAX_FAILED_LOGINS = 5;
+const LOCKOUT_MINUTES = 15;
+
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 20,
@@ -140,21 +145,62 @@ router.post(
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
+    // NIST AC-7: refuse the attempt outright if the account is currently locked.
+    if (user.lockedUntil && user.lockedUntil > new Date()) {
+      req.user = user;
+      const minutesLeft = Math.ceil((user.lockedUntil.getTime() - Date.now()) / 60000);
+      await logAuditEvent(req, {
+        action: "auth.login.locked",
+        outcome: "denied",
+        resourceType: "user",
+        resourceId: String(user._id),
+        details: `Login refused for ${email}; account locked`,
+        metadata: { lockedUntil: user.lockedUntil, minutesRemaining: minutesLeft }
+      });
+      return res.status(423).json({
+        message: `Account temporarily locked. Try again in ${minutesLeft} minute(s).`
+      });
+    }
+
     const valid = await bcrypt.compare(password, user.passwordHash);
 
     if (!valid) {
       req.user = user;
+      user.failedLoginCount = (user.failedLoginCount || 0) + 1;
+
+      let locked = false;
+      if (user.failedLoginCount >= MAX_FAILED_LOGINS) {
+        user.lockedUntil = new Date(Date.now() + LOCKOUT_MINUTES * 60 * 1000);
+        user.failedLoginCount = 0;
+        locked = true;
+      }
+      await user.save();
+
       await logAuditEvent(req, {
-        action: "auth.login.failed",
+        action: locked ? "auth.account.locked" : "auth.login.failed",
         outcome: "denied",
         resourceType: "user",
         resourceId: String(user._id),
-        details: `Invalid password for ${email}`
+        details: locked
+          ? `Account locked after ${MAX_FAILED_LOGINS} failed attempts for ${email}`
+          : `Invalid password for ${email}`,
+        metadata: locked
+          ? { lockedUntil: user.lockedUntil, lockoutMinutes: LOCKOUT_MINUTES }
+          : { failedLoginCount: user.failedLoginCount }
       });
+
+      if (locked) {
+        return res.status(423).json({
+          message: `Too many failed attempts. Account locked for ${LOCKOUT_MINUTES} minutes.`
+        });
+      }
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
+    // Successful auth resets the lockout counters.
     user.lastLoginAt = new Date();
+    user.failedLoginCount = 0;
+    user.lockedUntil = null;
     await user.save();
 
     const token = signToken(user);

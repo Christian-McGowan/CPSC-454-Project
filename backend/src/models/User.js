@@ -7,7 +7,9 @@ const userSchema = new mongoose.Schema(
     passwordHash: { type: String, required: true },
     role: { type: String, enum: ["doctor", "insurer", "admin"], default: "doctor" },
     organization: { type: String, trim: true, maxlength: 120, default: "AegisCare Network" },
-    lastLoginAt: { type: Date }
+    lastLoginAt: { type: Date },
+    failedLoginCount: { type: Number, default: 0 },
+    lockedUntil: { type: Date, default: null }
   },
   { timestamps: true }
 );

@@ -14,7 +14,9 @@ const auditEventSchema = new mongoose.Schema(
     details: { type: String, trim: true, maxlength: 800 },
     metadata: { type: mongoose.Schema.Types.Mixed, default: {} },
     ip: { type: String, trim: true },
-    userAgent: { type: String, trim: true }
+    userAgent: { type: String, trim: true },
+    previousHash: { type: String, trim: true, default: "GENESIS" },
+    hash: { type: String, trim: true, index: true }
   },
   { timestamps: true }
 );
