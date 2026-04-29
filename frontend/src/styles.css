@@ -1,6 +1,8 @@
 /* ============================================================
- * AegisCare Portal — clean professional theme
- * Palette: white surfaces, slate text, single blue accent
+ * AegisCare Portal — clinical medical theme
+ * Palette: warm off-white surfaces, slate text, clinical teal +
+ * mint accents. Designed to read as patient-facing healthcare
+ * software — calm, trustworthy, data-rich, but not sterile.
  * ============================================================ */
 
 :root {
@@ -14,25 +16,32 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  /* core palette — slate gray + single blue accent */
-  --bg: #f8fafc;             /* slate-50 */
+  /* core palette — slate text + clinical teal accent */
+  --bg: #f6faf9;             /* very soft mint-tinted off-white */
   --surface: #ffffff;
-  --surface-2: #f1f5f9;      /* slate-100 */
-  --border: #e2e8f0;         /* slate-200 */
-  --border-strong: #cbd5e1;  /* slate-300 */
+  --surface-2: #f0f6f5;      /* mint-leaning gray */
+  --surface-tinted: #ecf6f6; /* hero panel tint */
+  --border: #d8e4e3;         /* mint-leaning slate-200 */
+  --border-strong: #b8c8c7;  /* mint-leaning slate-300 */
+  --border-soft: #e6eeed;
 
-  --text-main: #0f172a;      /* slate-900 */
-  --text-soft: #475569;      /* slate-600 */
-  --text-muted: #64748b;     /* slate-500 */
+  --text-main: #0c2027;      /* deep teal-leaning slate */
+  --text-soft: #3f5762;      /* slate-600 with teal undertone */
+  --text-muted: #6b7f87;     /* slate-500 */
 
-  --accent: #2563eb;         /* blue-600 */
-  --accent-hover: #1d4ed8;   /* blue-700 */
-  --accent-soft: #eff6ff;    /* blue-50 */
-  --accent-soft-border: #dbeafe; /* blue-100 */
+  --accent: #0891b2;         /* cyan-600 — clinical teal */
+  --accent-hover: #0e7490;   /* cyan-700 */
+  --accent-deep: #155e75;    /* cyan-800 — for headings/contrast */
+  --accent-soft: #ecfeff;    /* cyan-50 */
+  --accent-soft-border: #cffafe; /* cyan-100 */
 
-  --success: #16a34a;
-  --success-bg: #f0fdf4;
-  --success-border: #bbf7d0;
+  --mint: #059669;           /* emerald-600 — verified/healthy */
+  --mint-soft: #ecfdf5;      /* emerald-50 */
+  --mint-border: #a7f3d0;    /* emerald-200 */
+
+  --success: #047857;        /* emerald-700 — deeper for legibility */
+  --success-bg: #ecfdf5;
+  --success-border: #a7f3d0;
 
   --warning: #b45309;
   --warning-bg: #fffbeb;
@@ -43,9 +52,10 @@
   --danger-border: #fecaca;
 
   /* elevation */
-  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
-  --shadow-md: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
-  --shadow-lg: 0 10px 24px -8px rgba(15, 23, 42, 0.10), 0 2px 6px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 1px 2px rgba(8, 32, 39, 0.04);
+  --shadow-md: 0 1px 3px rgba(8, 32, 39, 0.06), 0 1px 2px rgba(8, 32, 39, 0.04);
+  --shadow-lg: 0 10px 24px -8px rgba(8, 32, 39, 0.10), 0 2px 6px rgba(8, 32, 39, 0.04);
+  --ring: 0 0 0 3px rgba(8, 145, 178, 0.18);
 
   /* geometry */
   --radius-sm: 6px;
@@ -53,8 +63,9 @@
   --radius-lg: 12px;
   --radius-xl: 16px;
 
+  --mono: "JetBrains Mono", "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+
   color: var(--text-main);
-  background: var(--bg);
 }
 
 * {
@@ -65,8 +76,12 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background: var(--bg);
   color: var(--text-main);
+  background:
+    radial-gradient(circle at 0% 0%, rgba(8, 145, 178, 0.045), transparent 35%),
+    radial-gradient(circle at 100% 0%, rgba(5, 150, 105, 0.04), transparent 32%),
+    var(--bg);
+  background-attachment: fixed;
 }
 
 a {
@@ -124,6 +139,21 @@ button { cursor: pointer; }
   background: var(--surface);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+/* subtle accent stripe on top of the header */
+.public-nav::before,
+.app-header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent) 0%, var(--mint) 60%, var(--accent) 100%);
+  opacity: 0.85;
 }
 
 .public-nav nav {
@@ -147,6 +177,7 @@ button { cursor: pointer; }
   font-size: 1.05rem;
   font-weight: 600;
   letter-spacing: -0.01em;
+  color: var(--text-main);
 }
 
 .brand-lockup span {
@@ -156,16 +187,31 @@ button { cursor: pointer; }
 }
 
 .brand-mark {
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: var(--radius-md);
   display: grid;
   place-items: center;
   font-weight: 700;
   font-size: 0.85rem;
   color: white;
-  background: var(--accent);
+  background: linear-gradient(135deg, var(--accent) 0%, #0891b2 50%, var(--accent-deep) 100%);
   letter-spacing: 0.02em;
+  box-shadow: 0 2px 6px rgba(8, 145, 178, 0.30);
+  position: relative;
+}
+
+/* small medical "+" mark accent */
+.brand-mark::after {
+  content: "";
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--mint);
+  border: 2px solid var(--surface);
 }
 
 /* -------- main + sections -------- */
@@ -188,14 +234,30 @@ button { cursor: pointer; }
   padding: 32px;
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
-  background: var(--surface);
+  background:
+    radial-gradient(circle at 0% 0%, rgba(8, 145, 178, 0.06), transparent 45%),
+    radial-gradient(circle at 100% 100%, rgba(5, 150, 105, 0.05), transparent 40%),
+    var(--surface);
   box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-panel::after,
+.overview-hero::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, var(--accent) 0%, var(--mint) 100%);
 }
 
 .hero-copy h1,
 .hero-copy-panel h1 {
   margin: 12px 0 16px;
-  font-size: clamp(2.25rem, 4.5vw, 3.5rem);
+  font-size: clamp(2.25rem, 4.5vw, 3.4rem);
   line-height: 1.05;
   letter-spacing: -0.035em;
   font-weight: 600;
@@ -236,10 +298,23 @@ button { cursor: pointer; }
   padding: 6px 12px;
   border-radius: 6px;
   border: 1px solid var(--border);
-  background: var(--surface-2);
+  background: var(--surface);
   color: var(--text-soft);
   font-size: 0.82rem;
   font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* leading dot indicator on hero chips */
+.hero-points span::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--mint);
+  flex-shrink: 0;
 }
 
 /* -------- cards -------- */
@@ -268,15 +343,34 @@ button { cursor: pointer; }
 
 .hero-side-panel ul {
   margin: 0;
-  padding-left: 18px;
+  padding-left: 0;
+  list-style: none;
   color: var(--text-soft);
   display: grid;
   gap: 10px;
   font-size: 0.92rem;
 }
 
-.hero-side-panel ul li::marker {
-  color: var(--accent);
+.hero-side-panel ul li {
+  position: relative;
+  padding-left: 22px;
+}
+
+.hero-side-panel ul li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: var(--mint-soft);
+  color: var(--mint);
+  font-size: 10px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--mint-border);
 }
 
 /* -------- auth panel + tabs -------- */
@@ -318,7 +412,7 @@ button { cursor: pointer; }
 .auth-tabs button.active,
 .tab-bar button.active {
   background: var(--surface);
-  color: var(--accent);
+  color: var(--accent-deep);
   box-shadow: var(--shadow-sm);
   font-weight: 600;
 }
@@ -342,8 +436,9 @@ button { cursor: pointer; }
   display: grid;
   gap: 6px;
   font-weight: 500;
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   color: var(--text-main);
+  letter-spacing: 0.005em;
 }
 
 input,
@@ -369,7 +464,7 @@ input:focus,
 textarea:focus,
 select:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  box-shadow: var(--ring);
 }
 
 textarea {
@@ -382,11 +477,12 @@ textarea {
 .primary-button,
 .ghost-button {
   border-radius: var(--radius-md);
-  padding: 9px 16px;
+  padding: 10px 18px;
   border: 1px solid transparent;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 0.92rem;
-  transition: background 120ms ease, border-color 120ms ease, transform 80ms ease;
+  letter-spacing: 0.005em;
+  transition: background 120ms ease, border-color 120ms ease, transform 80ms ease, box-shadow 120ms ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -394,13 +490,14 @@ textarea {
 }
 
 .primary-button {
-  background: var(--accent);
+  background: linear-gradient(180deg, var(--accent) 0%, var(--accent-hover) 100%);
   color: white;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 1px 2px rgba(8, 145, 178, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .primary-button:hover:not(:disabled) {
-  background: var(--accent-hover);
+  background: linear-gradient(180deg, var(--accent-hover) 0%, var(--accent-deep) 100%);
+  box-shadow: 0 4px 12px rgba(8, 145, 178, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .primary-button:active:not(:disabled) {
@@ -415,7 +512,8 @@ textarea {
 
 .ghost-button:hover:not(:disabled) {
   background: var(--surface-2);
-  border-color: var(--text-muted);
+  border-color: var(--accent);
+  color: var(--accent-deep);
 }
 
 .primary-button:disabled,
@@ -433,10 +531,32 @@ textarea {
   border: 1px solid var(--border);
   font-size: 0.9rem;
   background: var(--surface);
+  position: relative;
+  padding-left: 36px;
+}
+
+.policy-card::before,
+.alert::before {
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: var(--accent);
 }
 
 .policy-card {
-  background: var(--surface-2);
+  background: var(--accent-soft);
+  border-color: var(--accent-soft-border);
+  color: var(--accent-deep);
+}
+
+.policy-card::before {
+  background: var(--accent);
+  box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.18);
 }
 
 .policy-card ul {
@@ -445,16 +565,28 @@ textarea {
   color: var(--text-soft);
 }
 
+.policy-card strong {
+  color: var(--accent-deep);
+}
+
 .alert {
   background: var(--danger-bg);
   color: var(--danger);
   border-color: var(--danger-border);
 }
 
+.alert::before {
+  background: var(--danger);
+}
+
 .alert.success {
   background: var(--success-bg);
   color: var(--success);
   border-color: var(--success-border);
+}
+
+.alert.success::before {
+  background: var(--success);
 }
 
 /* -------- grids -------- */
@@ -473,6 +605,30 @@ textarea {
 
 .info-card {
   padding: 22px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* subtle decorative corner accent on info-cards */
+.info-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 48px;
+  height: 48px;
+  background: radial-gradient(circle at 100% 0%, rgba(8, 145, 178, 0.08), transparent 70%);
+  pointer-events: none;
+}
+
+.info-card h3,
+.panel-card h3,
+.hero-side-panel h3 {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--text-main);
 }
 
 /* -------- step / eyebrow pills -------- */
@@ -481,19 +637,33 @@ textarea {
 .eyebrow-pill {
   display: inline-flex;
   align-items: center;
-  padding: 4px 10px;
-  border-radius: 6px;
+  gap: 6px;
+  padding: 4px 10px 4px 8px;
+  border-radius: 999px;
   border: 1px solid var(--accent-soft-border);
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-deep);
   font-weight: 600;
-  font-size: 0.78rem;
-  letter-spacing: 0.01em;
+  font-size: 0.74rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.step-pill::before,
+.eyebrow-pill::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--accent);
+  flex-shrink: 0;
 }
 
 .step-pill {
   margin-bottom: 14px;
   font-variant-numeric: tabular-nums;
+  font-family: var(--mono);
+  letter-spacing: 0.06em;
 }
 
 .split-panel {
@@ -507,6 +677,19 @@ textarea {
 
 .mini-card {
   padding: 16px;
+  position: relative;
+}
+
+.mini-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 16px;
+  bottom: 16px;
+  width: 3px;
+  background: var(--accent);
+  border-radius: 0 3px 3px 0;
+  opacity: 0.55;
 }
 
 /* -------- role guide -------- */
@@ -532,14 +715,29 @@ textarea {
 }
 
 .last-login {
-  color: var(--accent);
-  padding: 6px 12px;
+  color: var(--accent-deep);
+  padding: 5px 10px 5px 22px;
   border-radius: 6px;
   background: var(--accent-soft);
   border: 1px solid var(--accent-soft-border);
   white-space: nowrap;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 500;
+  position: relative;
+  font-variant-numeric: tabular-nums;
+}
+
+.last-login::before {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--mint);
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.18);
 }
 
 /* -------- messages -------- */
@@ -557,24 +755,41 @@ textarea {
 
 .stat-card {
   padding: 20px;
+  position: relative;
+  overflow: hidden;
 }
+
+.stat-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--accent);
+}
+
+.stat-card:nth-child(2)::before { background: var(--mint); }
+.stat-card:nth-child(3)::before { background: var(--accent); }
+.stat-card:nth-child(4)::before { background: var(--mint); }
 
 .stat-card strong {
   display: block;
-  font-size: 1.85rem;
+  font-size: 1.95rem;
   margin: 6px 0 4px;
   letter-spacing: -0.025em;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-main);
   font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
 }
 
 .stat-label {
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.10em;
   font-size: 0.7rem;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .dashboard-grid {
@@ -621,6 +836,7 @@ textarea {
   gap: 4px;
   width: 100%;
   cursor: pointer;
+  position: relative;
 }
 
 .selectable-list button:hover {
@@ -631,6 +847,29 @@ textarea {
 .selectable-list button.selected {
   border-color: var(--accent);
   background: var(--accent-soft);
+}
+
+.selectable-list button.selected::before {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: -1px;
+  bottom: -1px;
+  width: 3px;
+  background: var(--accent);
+  border-radius: 3px 0 0 3px;
+}
+
+.selectable-list button strong {
+  color: var(--text-main);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.selectable-list button p,
+.selectable-list button span:not(.badge) {
+  color: var(--text-muted);
+  font-size: 0.85rem;
 }
 
 /* -------- list rows -------- */
@@ -652,13 +891,39 @@ textarea {
   border: 1px solid var(--border);
 }
 
+.activity-item {
+  position: relative;
+  padding-left: 20px;
+}
+
+.activity-item::before {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.15);
+}
+
+.activity-item strong {
+  color: var(--text-main);
+  font-weight: 600;
+  font-size: 0.92rem;
+  font-family: var(--mono);
+  letter-spacing: -0.005em;
+}
+
 .activity-meta,
 .row-meta {
   display: grid;
   gap: 4px;
   justify-items: end;
   color: var(--text-muted);
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-variant-numeric: tabular-nums;
 }
 
@@ -668,18 +933,20 @@ textarea {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 5px;
   padding: 3px 9px;
   border-radius: 6px;
   background: var(--surface-2);
   color: var(--text-soft);
-  font-size: 0.78rem;
-  font-weight: 500;
+  font-size: 0.76rem;
+  font-weight: 600;
   border: 1px solid var(--border);
-  letter-spacing: 0.005em;
+  letter-spacing: 0.01em;
+  text-transform: lowercase;
 }
 
 .badge.info {
-  color: var(--accent);
+  color: var(--accent-deep);
   background: var(--accent-soft);
   border-color: var(--accent-soft-border);
 }
@@ -702,17 +969,21 @@ textarea {
   border-color: var(--danger-border);
 }
 
-/* -------- typography in panels -------- */
-
-.panel-card h3,
-.info-card h3,
-.hero-side-panel h3 {
-  margin: 0 0 8px;
-  font-size: 1.05rem;
-  font-weight: 600;
-  letter-spacing: -0.015em;
-  color: var(--text-main);
+/* dot indicator inside status badges */
+.badge.success::before,
+.badge.warning::before,
+.badge.info::before,
+.badge.danger::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: currentColor;
+  flex-shrink: 0;
+  opacity: 0.85;
 }
+
+/* -------- typography in panels -------- */
 
 .section-header {
   display: flex;
@@ -724,7 +995,7 @@ textarea {
 
 .section-header h2 {
   margin: 8px 0 4px;
-  font-size: 1.6rem;
+  font-size: 1.65rem;
   letter-spacing: -0.025em;
   font-weight: 600;
   color: var(--text-main);
@@ -764,7 +1035,15 @@ textarea {
   text-align: center;
   border: 1px dashed var(--border-strong);
   border-radius: var(--radius-md);
-  background: var(--surface-2);
+  background:
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      rgba(8, 145, 178, 0.025) 10px,
+      rgba(8, 145, 178, 0.025) 11px
+    ),
+    var(--surface-2);
   padding: 24px;
   color: var(--text-muted);
 }
@@ -777,6 +1056,11 @@ textarea {
 
 .matrix-row {
   flex-wrap: wrap;
+}
+
+.matrix-row strong {
+  color: var(--text-main);
+  font-weight: 600;
 }
 
 .evidence-col {
@@ -810,11 +1094,12 @@ textarea {
   display: grid;
   gap: 8px;
   box-shadow: var(--shadow-sm);
-  transition: border-color 120ms ease;
+  transition: border-color 120ms ease, transform 120ms ease;
 }
 
 .assessment-card:hover {
-  border-color: var(--border-strong);
+  border-color: var(--accent);
+  transform: translateY(-1px);
 }
 
 .assessment-card-head {
@@ -822,6 +1107,11 @@ textarea {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+}
+
+.assessment-card-head strong {
+  color: var(--text-main);
+  font-weight: 600;
 }
 
 .assessment-card p {
@@ -848,12 +1138,16 @@ textarea {
   max-width: 900px;
 }
 
-/* -------- tabular numbers everywhere status-like -------- */
+/* -------- monospace fingerprints for IDs -------- */
 
-.last-login,
-.activity-meta time,
-.row-meta time {
-  font-variant-numeric: tabular-nums;
+/* Patient/claim IDs and audit action codes commonly appear inside
+ * the selectable-list strong + activity-item strong + chip text.
+ * We already style activity-item strong in mono above; we lean
+ * into that fingerprint where IDs live. */
+.list-row p,
+.activity-item p,
+.matrix-row p {
+  font-size: 0.88rem;
 }
 
 /* -------- responsive -------- */
