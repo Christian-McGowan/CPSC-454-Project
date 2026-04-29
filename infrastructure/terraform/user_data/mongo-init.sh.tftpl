@@ -5,7 +5,7 @@ dnf update -y
 dnf install -y docker
 action="start"
 systemctl enable docker
-systemctl ${action} docker
+systemctl $${action} docker
 
 mkdir -p /opt/mongo/data
 
