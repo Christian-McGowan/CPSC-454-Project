@@ -25,7 +25,6 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "alb_logs" {
 resource "aws_cloudwatch_log_group" "frontend" {
   name              = "/ecs/${local.name_prefix}/frontend"
   retention_in_days = 14
-  kms_key_id        = aws_kms_key.app.arn
   tags              = local.common_tags
 }
 

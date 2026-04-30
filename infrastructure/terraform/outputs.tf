@@ -24,7 +24,7 @@ output "alerts_topic_arn" {
 }
 
 output "guardduty_detector_id" {
-  value = aws_guardduty_detector.main.id
+  value = length(aws_guardduty_detector.main) > 0 ? aws_guardduty_detector.main[0].id : null
 }
 
 output "automation_lambda_name" {
