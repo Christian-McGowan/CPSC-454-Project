@@ -5,12 +5,13 @@ resource "aws_lb" "main" {
   security_groups    = [aws_security_group.alb.id]
   subnets            = aws_subnet.public[*].id
 
-  access_logs {
+/*
+access_logs {
     bucket  = aws_s3_bucket.alb_logs.bucket
     prefix  = "alb"
     enabled = true
   }
-
+*/
   tags = merge(local.common_tags, { Name = "${local.name_prefix}-alb" })
 }
 

@@ -23,7 +23,7 @@ resource "aws_cloudwatch_log_group" "lambda_responder" {
 
   name              = "/aws/lambda/${local.name_prefix}-auto-containment"
   retention_in_days = 30
-  kms_key_id        = aws_kms_key.app.arn
+  //kms_key_id        = aws_kms_key.app.arn
   tags              = local.common_tags
 }
 
