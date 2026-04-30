@@ -6,12 +6,13 @@ resource "aws_lb" "main" {
   subnets            = aws_subnet.public[*].id
 
   /*
-access_logs {
+  access_logs {
     bucket  = aws_s3_bucket.alb_logs.bucket
     prefix  = "alb"
     enabled = true
   }
-*/
+  */
+
   tags = merge(local.common_tags, { Name = "${local.name_prefix}-alb" })
 }
 
@@ -55,12 +56,23 @@ resource "aws_lb_listener" "http" {
   protocol          = "HTTP"
 
   default_action {
-    type = "redirect"
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.frontend.arn
+  }
+}
 
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
+resource "aws_lb_listener_rule" "api_http" {
+  listener_arn = aws_lb_listener.http.arn
+  priority     = 10
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.backend.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/api/*", "/health"]
     }
   }
 }
