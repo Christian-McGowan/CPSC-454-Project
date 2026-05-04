@@ -39,9 +39,7 @@ This page explains the actual privacy model used by the app:
 - KMS-backed encryption in AWS
 - NIST SP 800-53 Access Control (AC) and Audit (AU) mapping
 
-## Why this project fits the assignment well
-
-This project is a direct cloud security implementation, not just a themed UI.
+## Key Security Functionalities
 
 ### Security focus
 - **IAM-style access separation:** the application has distinct roles for doctors, insurers, and admins
