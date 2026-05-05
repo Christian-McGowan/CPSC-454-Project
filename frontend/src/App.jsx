@@ -788,17 +788,6 @@ export default function App() {
                 <span>Audit history follows every action</span>
               </div>
             </div>
-            <div className="hero-side-panel">
-              <h3>A Sample demo</h3>
-              <ul>
-                <li>Open a patient record as a doctor and add a chart note.</li>
-                <li>Switch to Billing and show the claim queue.</li>
-                <li>Log in as an insurer and prove the chart is hidden.</li>
-                {["doctor", "admin"].includes(user.role) && (
-                  <li>Open Audit Trail to show that access was recorded.</li>
-                )}
-              </ul>
-            </div>
           </section>
 
           <section className="stats-grid">
@@ -1299,7 +1288,7 @@ export default function App() {
               <SectionHeader
                 eyebrow="Safeguards"
                 title="Privacy controls in the product"
-                body="These are the controls the demo is meant to show during the assignment."
+                body="These are the controls being shown in the assignment."
               />
               <div className="stack-list">
                 {privacyOverview.safeguards.map((item) => (
@@ -1388,8 +1377,6 @@ export default function App() {
                 <strong>Insurer demo:</strong> insurer.demo@aegiscare.local / InsurerDemo1
               </span>
               <span>
-                <strong>Tip:</strong> log in as doctor first, update a chart, then switch to the
-                insurer account and show that the chart is hidden while the claim is still visible.
               </span>
             </div>
           </section>

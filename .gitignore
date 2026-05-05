@@ -12,3 +12,16 @@ frontend/.env
 security/evidence/
 *.log
 .DS_Store
+
+# Terraform local/demo artifacts
+**/.terraform/
+**/.terraform.lock.hcl
+**/terraform.tfstate
+**/terraform.tfstate.backup
+**/terraform.tfvars
+**/*.tfplan
+**/tfplan
+**/*plan*.txt
+**/*plan*.txt~
+**/providers.tf.before-demo.bak
+**/providers.tf.s3-backend.bak
